@@ -13,10 +13,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Створюємо Адміна (логін: admin, пароль: admin)
         userService.createUser("admin", "admin", "ROLE_ADMIN");
-
-        // Створюємо звичайного юзера для тесту (логін: user, пароль: user)
         userService.createUser("user", "user", "ROLE_USER");
     }
 }

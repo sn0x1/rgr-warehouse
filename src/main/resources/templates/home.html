@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Головна</title>
+</head>
+<body style="padding: 20px;">
+    <h1>Вітаємо в РГР системі!</h1>
+
+<div th:if="${username}">
+        <h3 style="color: green;">Ви увійшли як: <span th:text="${username}">User</span></h3>
+        
+        <p><a href="/products" style="font-size: 20px;">📦 Перейти до складу товарів</a></p>
+
+        <form th:action="@{/logout}" method="post">
+            <input type="submit" value="Вийти"/>
+        </form>
+    </div>
+
+    <div th:unless="${username}">
+        <h3>Ви не авторизовані.</h3>
+        <a href="/login">Увійти в систему</a>
+    </div>
+</body>
+</html>

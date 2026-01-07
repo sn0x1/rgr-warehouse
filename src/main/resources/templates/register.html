@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Реєстрація</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+
+    <div class="card shadow p-4" style="width: 400px;">
+        <h2 class="text-center mb-4">Реєстрація</h2>
+
+        <div th:if="${param.error}" class="alert alert-danger text-center">
+            Паролі не співпадають!<br>Спробуйте ще раз.
+        </div>
+
+        <div th:if="${param.userExists}" class="alert alert-warning text-center">
+            Користувач з таким логіном вже існує!<br>Оберіть інше ім'я.
+        </div>
+
+        <form th:action="@{/register}" method="post">
+            <div class="mb-3">
+                <label class="form-label">Вигадайте логін</label>
+                <input type="text" name="username" class="form-control" required/>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Вигадайте пароль</label>
+                <input type="password" name="password" class="form-control" required/>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Підтвердіть пароль</label>
+                <input type="password" name="confirmPassword" class="form-control" required/>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Створити акаунт</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="/login" class="text-decoration-none">Вже маю акаунт</a>
+        </div>
+    </div>
+
+</body>
+</html>

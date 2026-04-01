@@ -1,0 +1,71 @@
+name: CI/CD Performance Testing (k6)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    # 1. Піднімаємо PostgreSQL контейнер для тестів
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: admin
+          POSTGRES_DB: rgr_db
+        ports:
+          - 5432:5432
+        # Перевірка, що БД дійсно готова приймати з'єднання
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    # 2. Отримуємо код з репозиторію
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 3. Встановлюємо Java 21
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    # 4. Даємо права на виконання файлу maven wrapper
+    - name: Make mvnw executable
+      run: chmod +x ./mvnw
+
+    # 5. Запускаємо Spring Boot додаток у фоновому режимі (&)
+    - name: Start Spring Boot Application
+      env:
+        DB_USERNAME: postgres
+        DB_PASSWORD: admin
+      run: |
+        ./mvnw spring-boot:run &
+        # Чекаємо 30 секунд, поки сервер підніметься на порту 8080
+        sleep 30
+
+    # 6. Встановлюємо k6 на віртуальну машину GitHub
+    - name: Setup k6
+      uses: grafana/setup-k6-action@v1
+
+    # 7. Запускаємо Smoke Test
+    - name: Run k6 Smoke Test
+      run: k6 run k6-tests/1-smoke-test.js
+
+    # 8. Запускаємо Login Stress Test
+    - name: Run k6 Login Stress Test
+      run: k6 run k6-tests/2-login-stress-test.js
+
+    # 9. Запускаємо Products Load Test
+    - name: Run k6 Products Load Test
+      run: k6 run k6-tests/3-products-load-test.js
